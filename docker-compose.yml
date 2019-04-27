@@ -1,0 +1,32 @@
+version: '2.1'
+
+services:
+
+  mongodb:
+    container_name: rocket_db
+    image: mongo:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_ROOT_HOST
+    command: mongod --smallfiles --oplogSize 128 --storageEngine=mmapv1
+    ports:
+    - 27017:27017
+    volumes:
+    - "./db:/data/db"
+
+  rocketchat:
+    container_name: rocket_app
+    image: rocketchat/rocket.chat:${rocket_version}
+    depends_on:
+    - mongodb
+    ports:
+    - 3000:3000
+    links:
+      - mongodb
+    environment:
+      MONGO_URL: "mongodb://mongodb/rocketchat"
+      ADMIN_USERNAME: admin
+      ADMIN_PASS: admin
